@@ -1,9 +1,9 @@
 fn main() {
-    let x = 5;
+    println!("Hello, world!");
 
-    let x = x + 1;
+    another_function();
+}
 
-    let x = x * 2;
-
-    println!("The value of x is: {}", x);
+fn another_function() {
+    println!("Another function.");  // 別の関数
 }
