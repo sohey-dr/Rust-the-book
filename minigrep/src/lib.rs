@@ -5,8 +5,8 @@ use std::io::prelude::*;
 pub struct Config {
     pub query: String,
     pub filename: String,
+    pub case_sensitive: bool,
 }
-
 
 pub fn run(config: Config) -> Result<(), Box<Error>> {
     let mut f = File::open(config.filename)?;
