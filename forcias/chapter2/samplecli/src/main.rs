@@ -1,31 +1,25 @@
-use clap::{App, Arg};
+use clap::Clap;
+use std::fs::File;
+use std::io::{BufRead, BufReader};
+
+struct Opts {
+    #[clap(short, long)]
+    verbose: bool,
+    #[clap(short, long)]
+    input: String,
+}
 
 fn main() {
-    let matches = App::new("My PRN program")
-        .version("1.0")
-        .author("Your name")
-        .about("Super awesome sample PRN calculator")
-        .arg(
-            Arg::new("formula_file")
-                .about("Formulas written in PRN")
-                .value_name("FILE")
-                .index(1)
-                .required(false),
-        )
-        .arg(
-            Arg::new("output_file")
-                .about("Output file")
-                .value_name("FILE")
-                .index(2)
-                .required(false),
-        )
-        .get_matches();
+    let opts = Opts::parse();
 
-    match matches.value_of("formula_file") {
-        Some(file) => println!("Using formula file: {}", file),
-        None => println!("No formula file"),
+    if let Some(path) = opts.formula_file {
+        let file = File::open(path).unwrap();
+        let reader = BufReader::new(file);
+        for line in reader.lines() {
+            let line = line.unwrap();
+            println!("{}", line);
+        }
+    } else {
+        println!("No formula file specified");
     }
-
-    let verbose = matches.is_present("verbose");
-    println!("Verbose: {}", verbose);
 }
