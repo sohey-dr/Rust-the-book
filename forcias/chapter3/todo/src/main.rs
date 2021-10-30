@@ -11,7 +11,10 @@ struct AddParams {
     text: String,
 }
 
-
+#[derive(Deserialize)]
+struct DeleteParams {
+    id: i32,
+}
 
 struct TodoEntry {
     id: u32,
@@ -46,6 +49,17 @@ async fn add_todo(
     let conn = db.get()?;
     let mut stmt = conn.prepare("INSERT INTO todo (text) VALUES (?1)")?;
     let _ = stmt.execute(&[&params.text])?;
+    Ok(HttpResponse::Found().header(header::LOCATION, "/").finish())
+}
+
+#[post("/delete")]
+async fn delete_todo(
+    params: web::Form<DeleteParams>,
+    db: web::Data<Pool<SqliteConnectionManager>>,
+) -> Result<HttpResponse, MyError> {
+    let conn = db.get()?;
+    let mut stmt = conn.prepare("DELETE FROM todo WHERE id = ?1")?;
+    let _ = stmt.execute(&[&params.id])?;
     Ok(HttpResponse::Found().header(header::LOCATION, "/").finish())
 }
 
@@ -87,6 +101,7 @@ async fn main() -> Result<(), actix_web::Error> {
         App::new()
             .service(index)
             .service(add_todo)
+            .service(delete_todo)
             .data(pool.clone()))
             .bind("0.0.0.0:8080")?
             .run()
